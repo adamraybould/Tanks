@@ -6,13 +6,10 @@
 #include "GameFramework/GameModeBase.h"
 #include "TanksGameMode.generated.h"
 
-UCLASS(minimalapi)
+UCLASS()
 class ATanksGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
-
-public:
-	ATanksGameMode();
 };
 
 
