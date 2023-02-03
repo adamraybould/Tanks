@@ -17,6 +17,7 @@ void ATankPlayerController::SetupInputComponent()
 
     InputComponent->BindAxis("MoveForward", this, &ATankPlayerController::ForwardMovement);
     InputComponent->BindAxis("MoveSideways", this, &ATankPlayerController::SidewaysMovement);
+    InputComponent->BindAction("Fire", IE_Pressed, this, &ATankPlayerController::Fire);
 }
 
 void ATankPlayerController::Tick(float DeltaTime)
@@ -39,4 +40,9 @@ void ATankPlayerController::SidewaysMovement(float value)
 {
     FVector direction = FVector(0.0f, value, 0.0f);
     player->Move(direction);
+}
+
+void ATankPlayerController::Fire()
+{
+    player->Fire();
 }

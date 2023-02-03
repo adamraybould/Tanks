@@ -25,4 +25,5 @@ protected:
 private:
 	void ForwardMovement(float value);
 	void SidewaysMovement(float value);
+	void Fire();
 };

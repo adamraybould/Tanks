@@ -5,6 +5,7 @@
 #include "Components/BoxComponent.h"
 #include <Kismet/GameplayStatics.h>
 #include "GameFramework/FloatingPawnMovement.h"
+#include "Projectile.h"
 
 // Sets default values
 ATank::ATank()
@@ -26,6 +27,9 @@ ATank::ATank()
 
 	RightTrack = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Right Track Mesh"));
 	RightTrack->SetupAttachment(BaseMesh);
+
+	ProjectileSpawnPoint = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Projectile Spawn Point"));
+	ProjectileSpawnPoint->SetupAttachment(TurretMesh);
 
 	PawnMovement = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("Pawn Movement"));
 	AddOwnedComponent(PawnMovement);
@@ -56,9 +60,14 @@ void ATank::Move(FVector direction)
 
 	if (PawnMovement->Velocity != FVector::ZeroVector)
 	{
-		movementDirection = GetActorLocation() + PawnMovement->Velocity;
-		RotateBase(movementDirection);
+		RotateBase(GetActorLocation() + PawnMovement->Velocity);
 	}
+}
+
+void ATank::Fire()
+{
+	AProjectile* projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, ProjectileSpawnPoint->GetComponentLocation(), ProjectileSpawnPoint->GetComponentRotation());
+	projectile->SetOwner(this);
 }
 
 void ATank::RotateBase(FVector direction)
