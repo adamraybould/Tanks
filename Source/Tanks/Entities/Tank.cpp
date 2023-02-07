@@ -6,6 +6,7 @@
 #include <Kismet/GameplayStatics.h>
 #include "GameFramework/FloatingPawnMovement.h"
 #include "Projectile.h"
+#include "Tanks/EntityHealth.h"
 
 // Sets default values
 ATank::ATank()
@@ -20,7 +21,7 @@ ATank::ATank()
 	BaseMesh->SetupAttachment(BoxCollider);
 
 	TurretMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Turret Mesh"));
-	TurretMesh->SetupAttachment(BaseMesh);
+	TurretMesh->SetupAttachment(BoxCollider);
 
 	LeftTrack = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Left Track Mesh"));
 	LeftTrack->SetupAttachment(BaseMesh);
@@ -30,6 +31,9 @@ ATank::ATank()
 
 	ProjectileSpawnPoint = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Projectile Spawn Point"));
 	ProjectileSpawnPoint->SetupAttachment(TurretMesh);
+
+	EntityHealth = CreateDefaultSubobject<UEntityHealth>(TEXT("Entity Health"));
+	AddOwnedComponent(EntityHealth);
 
 	PawnMovement = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("Pawn Movement"));
 	AddOwnedComponent(PawnMovement);

@@ -32,6 +32,9 @@ private:
 	USceneComponent* ProjectileSpawnPoint;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	class UEntityHealth* EntityHealth;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	class UFloatingPawnMovement* PawnMovement;
 
 	// Propeties
