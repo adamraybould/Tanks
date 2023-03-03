@@ -2,25 +2,31 @@
 
 
 #include "EntityHealth.h"
-#include <Perception/AIPerceptionComponent.h>
 #include <Kismet/GameplayStatics.h>
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 
 // Sets default values for this component's properties
 UEntityHealth::UEntityHealth()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = false;
+	PrimaryComponentTick.bCanEverTick = true;
+}
 
+void UEntityHealth::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
 void UEntityHealth::Kill()
 {
 	if (DeathParticles)
 	{
-		UGameplayStatics::SpawnEmitterAtLocation(this, DeathParticles, GetOwner()->GetActorLocation(), GetOwner()->GetActorRotation());
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, DeathParticles, GetOwner()->GetActorLocation(), GetOwner()->GetActorRotation());
 	}
 
+	OnDeath.Broadcast(GetOwner());
 	GetOwner()->Destroy();
 }
 
@@ -32,7 +38,10 @@ void UEntityHealth::BeginPlay()
 	GetOwner()->OnTakeAnyDamage.AddDynamic(this, &UEntityHealth::OnHit);
 }
 
-void UEntityHealth::OnHit(AActor* damagedActor, float damage, const UDamageType* damageType, AController* instigator, AActor* damageCauser)
+void UEntityHealth::OnHit(AActor* damagedActor, float damage, const UDamageType* damageType, class AController* instigator, AActor* damageCauser)
 {
 	Kill();
+
+	// Destroy the Projectile
+	damageCauser->Destroy();
 }

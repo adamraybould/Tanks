@@ -10,6 +10,12 @@ UCLASS()
 class ATanksGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
+
+protected:
+	virtual void BeginPlay() override;
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnActorDeath(AActor* killedActor);
 };
 
 

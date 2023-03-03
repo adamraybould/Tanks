@@ -6,10 +6,19 @@
 #include "GameFramework/Pawn.h"
 #include "Tank.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FFireSignature, ATank*, tank, AProjectile*, projectile);
+
 UCLASS()
 class TANKS_API ATank : public APawn
 {
 	GENERATED_BODY()
+
+public:
+	UPROPERTY(BlueprintAssignable, Category = "Combat")
+	FFireSignature OnFire;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Combat")
+	TSubclassOf<class AProjectile> Projectile;
 
 private:
 	// Components
@@ -32,16 +41,19 @@ private:
 	USceneComponent* ProjectileSpawnPoint;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	class UArrowComponent* TurretDirection;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	class UEntityHealth* EntityHealth;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	class UFloatingPawnMovement* PawnMovement;
 
-	// Propeties
-	UPROPERTY(EditDefaultsOnly, Category = "Combat")
-	TSubclassOf<class AProjectile> ProjectileClass;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	class UAudioComponent* MovementAudio;
 
-	UPROPERTY(EditAnywhere, Category = "Movement");
+	// Propeties
+	UPROPERTY(EditAnywhere, Category = "Movement")
 	float rotationSpeed = 5.0f;
 
 public:
@@ -60,8 +72,15 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void Move(FVector direction);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void Fire();
 
-	void RotateBase(FVector direction);
-	void RotateTurret(FVector direction);
+	UFUNCTION(BlueprintCallable)
+	float RotateBase(FVector direction);
+	UFUNCTION(BlueprintCallable)
+	float RotateTurret(FVector direction);
+
+	UFUNCTION(BlueprintCallable)
+	AActor* FireBarrelRay();
 };

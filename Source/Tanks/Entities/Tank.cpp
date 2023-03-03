@@ -4,9 +4,11 @@
 #include "Tank.h"
 #include "Components/BoxComponent.h"
 #include <Kismet/GameplayStatics.h>
+#include "Components/ArrowComponent.h"
 #include "GameFramework/FloatingPawnMovement.h"
 #include "Projectile.h"
 #include "Tanks/EntityHealth.h"
+#include "Components/AudioComponent.h"
 
 // Sets default values
 ATank::ATank()
@@ -32,11 +34,18 @@ ATank::ATank()
 	ProjectileSpawnPoint = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Projectile Spawn Point"));
 	ProjectileSpawnPoint->SetupAttachment(TurretMesh);
 
+	TurretDirection = CreateDefaultSubobject<UArrowComponent>(TEXT("Turret Direction"));
+	TurretDirection->SetupAttachment(TurretMesh);
+
 	EntityHealth = CreateDefaultSubobject<UEntityHealth>(TEXT("Entity Health"));
 	AddOwnedComponent(EntityHealth);
 
 	PawnMovement = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("Pawn Movement"));
 	AddOwnedComponent(PawnMovement);
+
+	MovementAudio = CreateDefaultSubobject<UAudioComponent>(TEXT("Movement Audio"));
+	AddOwnedComponent(MovementAudio);
+	MovementAudio->VolumeMultiplier = 0.2f;
 }
 
 // Called when the game starts or when spawned
@@ -65,28 +74,63 @@ void ATank::Move(FVector direction)
 	if (PawnMovement->Velocity != FVector::ZeroVector)
 	{
 		RotateBase(GetActorLocation() + PawnMovement->Velocity);
+
+		// Play Movement Audio if not Already
+		if (!MovementAudio->IsPlaying())
+		{
+			MovementAudio->Play();
+		}
+	}
+	else
+	{
+		// Stop Movement Audio if Not Moving
+		if (MovementAudio->IsPlaying())
+		{
+			MovementAudio->FadeOut(0.2f, 0.0f);
+		}
 	}
 }
 
-void ATank::Fire()
-{
-	AProjectile* projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, ProjectileSpawnPoint->GetComponentLocation(), ProjectileSpawnPoint->GetComponentRotation());
-	projectile->SetOwner(this);
-}
-
-void ATank::RotateBase(FVector direction)
+float ATank::RotateBase(FVector direction)
 {
 	FVector toTarget = direction - GetActorLocation();
 	FRotator lookAtRotation = FRotator(0.0f, toTarget.Rotation().Yaw, 0.0f);
 
 	BaseMesh->SetWorldRotation(FMath::RInterpTo(BaseMesh->GetComponentRotation(), lookAtRotation, UGameplayStatics::GetWorldDeltaSeconds(this), rotationSpeed));
+
+	// Gets the Dot Product
+	return toTarget.Dot(BaseMesh->GetForwardVector());
 }
 
-void ATank::RotateTurret(FVector direction)
+float ATank::RotateTurret(FVector direction)
 {
 	FVector toTarget = direction - TurretMesh->GetComponentLocation();
 	FRotator lookAtRotation = FRotator(0.0f, toTarget.Rotation().Yaw, 0.0f);
 
 	TurretMesh->SetWorldRotation(FMath::RInterpTo(TurretMesh->GetComponentRotation(), lookAtRotation, UGameplayStatics::GetWorldDeltaSeconds(this), rotationSpeed));
-	DrawDebugLine(GetWorld(), GetActorLocation(), direction, FColor::Red, false, -1.0f);
+	//DrawDebugLine(GetWorld(), GetActorLocation(), direction, FColor::Red, false, -1.0f);
+
+	// Gets the Dot Product
+	return toTarget.Dot(TurretMesh->GetForwardVector());
+}
+
+AActor* ATank::FireBarrelRay()
+{
+	FHitResult* hit = new FHitResult();
+	FVector start = ProjectileSpawnPoint->GetComponentLocation();
+	FVector end = start + (TurretMesh->GetForwardVector() * 5000.0f);
+
+	FCollisionQueryParams parms;
+	parms.AddIgnoredActor(this);
+	if (GetWorld()->LineTraceSingleByChannel(*hit, start, end, ECC_Visibility, parms, FCollisionResponseParams()))
+	{
+		if (hit->GetActor() != nullptr)
+		{
+			return hit->GetActor();
+		}
+	}
+
+	DrawDebugLine(GetWorld(), start, end, FColor::Red, false, -1.0f);
+
+	return nullptr;
 }

@@ -50,7 +50,7 @@ void AProjectile::OnHit(UPrimitiveComponent* hitComp, AActor* otherActor, UPrimi
 	if (owner == nullptr)
 		return;
 
-	if (otherActor && otherActor != this && otherActor != owner)
+	if (otherActor)
 	{
 		UGameplayStatics::ApplyDamage(otherActor, damage, owner->GetInstigatorController(), this, UDamageType::StaticClass());
 
