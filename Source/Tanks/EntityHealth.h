@@ -14,8 +14,11 @@ class TANKS_API UEntityHealth : public UActorComponent
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(BlueprintAssignable, Category = "Damage")
+	UPROPERTY(BlueprintAssignable)
 	FDeathSignature OnDeath;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly);
+	bool IsDead;
 
 private:
 	UPROPERTY(EditAnywhere)

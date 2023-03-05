@@ -52,8 +52,6 @@ ATank::ATank()
 void ATank::BeginPlay()
 {
 	Super::BeginPlay();
-
-	EntityHealth->OnDeath.AddDynamic(this, &ATank::OnTankDeath);
 }
 
 // Called every frame
@@ -70,6 +68,9 @@ void ATank::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void ATank::Move(FVector direction)
 {
+	if (EntityHealth->IsDead)
+		return;
+
 	PawnMovement->AddInputVector(direction);
 
 	if (PawnMovement->Velocity != FVector::ZeroVector)
@@ -117,6 +118,9 @@ float ATank::RotateTurret(FVector direction)
 
 AActor* ATank::FireBarrelRay()
 {
+	if (EntityHealth->IsDead)
+		return nullptr;
+
 	FHitResult* hit = new FHitResult();
 	FVector start = ProjectileSpawnPoint->GetComponentLocation();
 	FVector end = start + (TurretMesh->GetForwardVector() * 5000.0f);
@@ -134,9 +138,4 @@ AActor* ATank::FireBarrelRay()
 	DrawDebugLine(GetWorld(), start, end, FColor::Red, false, -1.0f);
 
 	return nullptr;
-}
-
-void ATank::OnTankDeath(AActor* killedActor)
-{
-	MovementAudio->Stop();
 }

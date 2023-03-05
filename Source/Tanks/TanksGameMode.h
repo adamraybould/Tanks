@@ -11,6 +11,16 @@ class ATanksGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int score;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int playerLives;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	int tankCount;
+
 protected:
 	virtual void BeginPlay() override;
 

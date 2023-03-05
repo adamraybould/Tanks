@@ -9,6 +9,7 @@ void ATanksGameMode::BeginPlay()
 {
 	TArray<AActor*> tanks;
 	UGameplayStatics::GetAllActorsOfClass(this, AActor::StaticClass(), tanks);
+	tankCount = tanks.Num();
 
 	for (int i = 0; i < tanks.Num(); i++)
 	{

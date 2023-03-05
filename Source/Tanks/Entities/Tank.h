@@ -11,6 +11,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FFireSignature, ATank*, tank, AProj
 UENUM(BlueprintType)
 enum class ETankType : uint8
 {
+	TANK_PLAYER UMETA(DisplayName = "Tank_Player"),
 	TANK_BROWN UMETA(DisplayName = "Tank_Brown"),
 	TANK_GREY UMETA(DisplayName = "Tank_Grey"),
 	TANK_TEAL UMETA(DisplayName = "Tank_Teal")
@@ -94,7 +95,4 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	AActor* FireBarrelRay();
-
-private:
-	void OnTankDeath(AActor* killedActor);
 };
