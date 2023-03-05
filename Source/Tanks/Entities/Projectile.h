@@ -32,6 +32,11 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Audio")
 	class USoundBase* FireSound;
 
+	UPROPERTY(EditAnywhere, Category = "Audio")
+	class USoundBase* HitSound;
+
+	UPROPERTY(EditAnywhere, Category = "Audio")
+	class USoundBase* BounceSound;
 
 	// Propeties
 	UPROPERTY(EditAnywhere, Category = "Combat");

@@ -5,6 +5,7 @@
 #include <GameFramework/ProjectileMovementComponent.h>
 #include <Kismet/GameplayStatics.h>
 #include "Particles/ParticleSystemComponent.h"
+#include <Tanks/Entities/Tank.h>
 
 // Sets default values
 AProjectile::AProjectile()
@@ -52,25 +53,41 @@ void AProjectile::OnHit(UPrimitiveComponent* hitComp, AActor* otherActor, UPrimi
 
 	if (otherActor)
 	{
-		UGameplayStatics::ApplyDamage(otherActor, damage, owner->GetInstigatorController(), this, UDamageType::StaticClass());
-
-		SetActorRotation(ProjectileMovement->Velocity.Rotation());
-		bounces++;
-
-		if (bounces >= maxBounceCount)
+		if (Cast<ATank>(otherActor))
 		{
-			if (HitParticles)
-			{
-				UGameplayStatics::SpawnEmitterAtLocation(this, HitParticles, GetActorLocation(), GetActorRotation());
-			}
-
+			UGameplayStatics::ApplyDamage(otherActor, damage, owner->GetInstigatorController(), this, UDamageType::StaticClass());
 			Destroy();
 		}
 		else
 		{
-			if (BounceParticles)
+			SetActorRotation(ProjectileMovement->Velocity.Rotation());
+			bounces++;
+
+			if (bounces >= maxBounceCount)
 			{
-				UGameplayStatics::SpawnEmitterAtLocation(this, BounceParticles, GetActorLocation(), GetActorRotation());
+				if (HitParticles)
+				{
+					UGameplayStatics::SpawnEmitterAtLocation(this, HitParticles, GetActorLocation(), GetActorRotation());
+				}
+
+				if (HitSound)
+				{
+					UGameplayStatics::PlaySound2D(this, HitSound);
+				}
+
+				Destroy();
+			}
+			else
+			{
+				if (BounceParticles)
+				{
+					UGameplayStatics::SpawnEmitterAtLocation(this, BounceParticles, GetActorLocation(), GetActorRotation());
+				}
+
+				if (BounceSound)
+				{
+					UGameplayStatics::PlaySound2D(this, BounceSound);
+				}
 			}
 		}
 	}

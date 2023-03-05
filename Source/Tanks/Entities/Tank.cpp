@@ -52,13 +52,14 @@ ATank::ATank()
 void ATank::BeginPlay()
 {
 	Super::BeginPlay();
+
+	EntityHealth->OnDeath.AddDynamic(this, &ATank::OnTankDeath);
 }
 
 // Called every frame
 void ATank::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 // Called to bind functionality to input
@@ -133,4 +134,9 @@ AActor* ATank::FireBarrelRay()
 	DrawDebugLine(GetWorld(), start, end, FColor::Red, false, -1.0f);
 
 	return nullptr;
+}
+
+void ATank::OnTankDeath(AActor* killedActor)
+{
+	MovementAudio->Stop();
 }
