@@ -22,7 +22,10 @@ public:
 
 private:
 	UPROPERTY(EditAnywhere)
-	class UNiagaraSystem* DeathParticles;
+	class USoundBase* deathSound;
+
+	UPROPERTY(EditAnywhere)
+	class UNiagaraSystem* deathParticles;
 
 public:	
 	// Sets default values for this component's properties

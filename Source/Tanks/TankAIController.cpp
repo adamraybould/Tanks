@@ -10,11 +10,11 @@ ATankAIController::ATankAIController()
 	
 }
 
-void ATankAIController::BeginPlay()
+void ATankAIController::OnPossess(APawn* InPawn)
 {
-	Super::BeginPlay();
+	Super::OnPossess(InPawn);
 
-	Tank = Cast<ATank>(GetPawn());
+	Tank = Cast<ATank>(InPawn);
 	PawnMovement = Tank->FindComponentByClass<UFloatingPawnMovement>();
 }
 

@@ -21,9 +21,14 @@ void UEntityHealth::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 
 void UEntityHealth::Kill()
 {
-	if (DeathParticles)
+	if (deathParticles)
 	{
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, DeathParticles, GetOwner()->GetActorLocation(), GetOwner()->GetActorRotation());
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, deathParticles, GetOwner()->GetActorLocation(), GetOwner()->GetActorRotation());
+	}
+
+	if (deathSound)
+	{
+		UGameplayStatics::PlaySound2D(this, deathSound);
 	}
 
 	OnDeath.Broadcast(GetOwner());

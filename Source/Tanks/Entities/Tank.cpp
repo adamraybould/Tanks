@@ -9,6 +9,7 @@
 #include "Projectile.h"
 #include "Tanks/EntityHealth.h"
 #include "Components/AudioComponent.h"
+#include <Tanks/TanksGameMode.h>
 
 // Sets default values
 ATank::ATank()
@@ -52,6 +53,9 @@ ATank::ATank()
 void ATank::BeginPlay()
 {
 	Super::BeginPlay();
+
+	tanksGameMode = Cast<ATanksGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	EntityHealth->OnDeath.AddDynamic(this, &ATank::OnDeath);
 }
 
 // Called every frame
@@ -68,7 +72,7 @@ void ATank::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void ATank::Move(FVector direction)
 {
-	if (EntityHealth->IsDead)
+	if (EntityHealth->IsDead || !tanksGameMode->CanPerformAction())
 		return;
 
 	PawnMovement->AddInputVector(direction);
@@ -95,6 +99,9 @@ void ATank::Move(FVector direction)
 
 float ATank::RotateBase(FVector direction)
 {
+	if (EntityHealth->IsDead || !tanksGameMode->CanPerformAction())
+		return 0.0f;
+
 	FVector toTarget = direction - GetActorLocation();
 	FRotator lookAtRotation = FRotator(0.0f, toTarget.Rotation().Yaw, 0.0f);
 
@@ -106,6 +113,9 @@ float ATank::RotateBase(FVector direction)
 
 float ATank::RotateTurret(FVector direction)
 {
+	if (EntityHealth->IsDead || !tanksGameMode->CanPerformAction())
+		return 0.0f;
+
 	FVector toTarget = direction - TurretMesh->GetComponentLocation();
 	FRotator lookAtRotation = FRotator(0.0f, toTarget.Rotation().Yaw, 0.0f);
 
@@ -118,7 +128,7 @@ float ATank::RotateTurret(FVector direction)
 
 AActor* ATank::FireBarrelRay()
 {
-	if (EntityHealth->IsDead)
+	if (EntityHealth->IsDead || !tanksGameMode->CanPerformAction())
 		return nullptr;
 
 	FHitResult* hit = new FHitResult();
@@ -138,4 +148,9 @@ AActor* ATank::FireBarrelRay()
 	DrawDebugLine(GetWorld(), start, end, FColor::Red, false, -1.0f);
 
 	return nullptr;
+}
+
+void ATank::OnDeath(AActor* killedTank)
+{
+	MovementAudio->Stop();
 }

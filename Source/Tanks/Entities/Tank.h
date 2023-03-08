@@ -33,6 +33,9 @@ public:
 	ETankType TankType;
 
 private:
+	class ATanksGameMode* tanksGameMode;
+
+private:
 	// Components
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	class UBoxComponent* BoxCollider;
@@ -95,4 +98,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	AActor* FireBarrelRay();
+
+private:
+	UFUNCTION()
+	void OnDeath(AActor* killedTank);
 };
